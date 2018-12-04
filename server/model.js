@@ -2,16 +2,15 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const User = new Schema({
-  _id: new mongoose.Types.ObjectId(),
   first_name: String,
   surname: String,
-  email: String,
-  username: String,
+  email: { type: String, unique: true },
+  username: { type: String, unique: true },
   pass_hash: String,
   city: String,
   country: String,
   age: Number,
-  joined_at: new Date()
+  joined_at: Number
 });
 
 const UserModel = mongoose.model("User", User);
