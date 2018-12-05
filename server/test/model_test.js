@@ -1,9 +1,7 @@
 const mocha = require("mocha");
 const assert = require("assert");
 const UserModel = require("../model.js");
-Promise = require("bluebird");
 const mongoose = require("mongoose");
-mongoose.Promise = Promise;
 const db = require("../db.js");
 
 describe("Users:", function() {
@@ -35,9 +33,9 @@ describe("Users:", function() {
     });
   });
 
-  after(function(done) {
-    UserModel.find({ first_name: "Thomas" })
-      .deleteOne(done)
-      .exec();
-  });
+  // after(function(done) {
+  //   UserModel.find({ first_name: "Thomas" })
+  //     .deleteOne(done)
+  //     .exec();
+  // });
 });

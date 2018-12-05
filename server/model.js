@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const db = require("./db.js");
 const Schema = mongoose.Schema;
 
 const User = new Schema({
@@ -6,7 +7,7 @@ const User = new Schema({
   surname: String,
   email: { type: String, unique: true },
   username: { type: String, unique: true },
-  pass_hash: String,
+  password: String,
   city: String,
   country: String,
   age: Number,
