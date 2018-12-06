@@ -3,12 +3,13 @@ const router = require("./router");
 const bodyParser = require("koa-bodyparser");
 const logger = require("koa-logger");
 const app = new Koa();
+const cors = require("@koa/cors");
 
 app.use(logger());
 app.use(
   bodyParser({
     extendTypes: {
-      json: ["application/x-javascript"] // will parse application/x-javascript type body as a JSON string
+      json: ["application/json"] // will parse application/x-javascript type body as a JSON string
     }
   })
 );

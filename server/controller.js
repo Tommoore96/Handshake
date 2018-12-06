@@ -23,6 +23,7 @@ controller.signUp = async (ctx, next) => {
 controller.signIn = async (ctx, next) => {
   const username = ctx.request.body.username;
   const password = ctx.request.body.password;
+  console.log("hello");
 
   const user = await UserModel.findOne({ username: username });
 
@@ -30,11 +31,16 @@ controller.signIn = async (ctx, next) => {
 
   const obj = {};
 
-  obj.token = await jwt.sign({ user: ctx.request.body }, "secretKey");
+  obj.token = await jwt.sign({ user: ctx.request.body }, "secretKey", {
+    expiresIn: "32d"
+  });
 
   ctx.cookies.set("Authorization", `Bearer ${obj.token}`);
 
-  ctx.body = match ? obj : "No such user found.";
+  ctx.body = "good";
+  // ctx.body = match ? obj : "No such user found.";
+
+  ctx.status = 204;
 };
 
 module.exports = controller;
