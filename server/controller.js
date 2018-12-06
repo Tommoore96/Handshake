@@ -1,8 +1,8 @@
 const UserModel = require("./model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 const token = jwt.sign({ foo: "bar" }, "shhhhh");
-const db = require("./db");
 
 const controller = {};
 
@@ -24,37 +24,17 @@ controller.signIn = async (ctx, next) => {
   const username = ctx.request.body.username;
   const password = ctx.request.body.password;
 
-  UserModel.findOne({ username: username })
-    .then(function(user) {
-      console.log(user);
-      return bcrypt.compare(password, user.password);
-    })
-    .then(function(samePassword) {
-      console.log("samePassword: ", samePassword);
-      if (!samePassword) {
-        ctx.status = 403;
-      } else {
-        ctx.status = 200;
-      }
-      console.log("status ", ctx.status);
-    })
-    .catch(function(error) {
-      console.log("Error authenticating user: ");
-      console.log(error);
-      next();
-    });
+  const user = await UserModel.findOne({ username: username });
 
-  ctx.status = 200;
+  const match = await bcrypt.compare(password, user.password);
 
-  // const req = ctx.request.body,
-  // const password;
+  const obj = {};
 
-  // bcrypt.genSalt(10, function(err, salt) {
-  //   bcrypt.hash(ctx.request.body.password, salt, function(err, hash) {
-  //     password = hash;
-  //   });
-  // });
-  // UserModel.findOne({username: req.username, password: password});
+  obj.token = await jwt.sign({ user: ctx.request.body }, "secretKey");
+
+  ctx.cookies.set("Authorization", `Bearer ${obj.token}`);
+
+  ctx.body = match ? obj : "No such user found.";
 };
 
 module.exports = controller;
