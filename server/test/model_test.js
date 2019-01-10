@@ -33,9 +33,9 @@ describe("Users:", function() {
     });
   });
 
-  // after(function(done) {
-  //   UserModel.find({ first_name: "Thomas" })
-  //     .deleteOne(done)
-  //     .exec();
-  // });
+  after(function(done) {
+    UserModel.find({ first_name: "Thomas" })
+      .deleteOne(done)
+      .exec();
+  });
 });

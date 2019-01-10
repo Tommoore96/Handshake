@@ -2,45 +2,64 @@ const UserModel = require("./model.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const token = jwt.sign({ foo: "bar" }, "shhhhh");
-
 const controller = {};
 
-controller.signUp = async (ctx, next) => {
+controller.signUp = ctx => {
   const newUser = new UserModel(ctx.request.body);
 
   newUser.joined_at = new Date();
+
   bcrypt.hash(newUser.password, 10, function(err, hash) {
     newUser.password = hash;
     newUser.save();
   });
 
-  next();
-  ctx.status = 200;
-  ctx.body = token;
-};
-
-controller.signIn = async (ctx, next) => {
-  const username = ctx.request.body.username;
-  const password = ctx.request.body.password;
-  console.log("hello");
-
-  const user = await UserModel.findOne({ username: username });
-
-  const match = await bcrypt.compare(password, user.password);
-
-  const obj = {};
-
-  obj.token = await jwt.sign({ user: ctx.request.body }, "secretKey", {
+  const token = jwt.sign(ctx.request.body, "secretKey", {
     expiresIn: "32d"
   });
 
-  ctx.cookies.set("Authorization", `Bearer ${obj.token}`);
+  ctx.cookies.set("Authorization", `Bearer ${token}`);
 
-  ctx.body = "good";
-  // ctx.body = match ? obj : "No such user found.";
+  ctx.status = 200;
+};
 
-  ctx.status = 204;
+controller.signIn = ctx => {
+  const username = ctx.request.body.username,
+    password = ctx.request.body.password,
+    user = UserModel.findOne({ username: username });
+
+  if (!user) {
+    ctx.status = 401;
+    return;
+  }
+
+  const match = bcrypt.compare(password, user.password);
+
+  if (!match) {
+    ctx.status = 401;
+    return;
+  }
+
+  const token = jwt.sign(ctx.request.body, "secretKey", {
+    expiresIn: "32d"
+  });
+
+  ctx.cookies.set("Authorization", `Bearer ${token}`);
+
+  ctx.status = 200;
+};
+
+controller.details = ctx => {
+  console.log("accepted");
+
+  // jwt.verify(ctx.request.token, "secretKey", (err, authData) => {
+  //   if (err) {
+  //     ctx.body = err;
+  //     ctx.status = 401;
+  //   } else {
+  //     ctx.body = `you're signed in!  ${authData}`;
+  //   }
+  // });
 };
 
 module.exports = controller;
