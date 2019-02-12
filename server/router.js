@@ -11,33 +11,27 @@ router.post("/signup", controller.signUp);
 router.get("/details", verifyToken, controller.details);
 
 function verifyToken(ctx, next) {
-  // Get auth header value
   const bearerHeader = ctx.request.headers["authorization"];
-  // Check if bearer is undefined
   if (typeof bearerHeader !== "undefined") {
     const bearer = bearerHeader.split(" "),
       bearerToken = bearer[1],
       decoded = jwt.verify(bearerToken, "secretKey"),
-      username = decoded.username,
-      password = decoded.password,
-      user = UserModel.findOne({ username: username });
+      user = UserModel.findOne({ username: decoded.username });
 
     if (!user) {
       ctx.status = 401;
       return;
     }
 
-    bcrypt.compare(password, user.password, (err, ctx) => {
+    bcrypt.compare(decoded.password, user.password, err => {
       if (err) {
         console.log(err);
-        ctx.status = 401;
         return;
       } else {
         next();
       }
     });
   } else {
-    // Forbidden
     ctx.status = 401;
   }
 }

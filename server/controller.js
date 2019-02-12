@@ -6,20 +6,25 @@ const controller = {};
 
 controller.signUp = ctx => {
   const newUser = new UserModel(ctx.request.body);
-
   newUser.joined_at = new Date();
 
   bcrypt.hash(newUser.password, 10, function(err, hash) {
     newUser.password = hash;
-    newUser.save();
   });
-
-  const token = jwt.sign(ctx.request.body, "secretKey", {
-    expiresIn: "32d"
-  });
-
-  ctx.cookies.set("Authorization", `Bearer ${token}`);
-
+  newUser
+    .save()
+    .then(() => {
+      return newUser.generateAuthToken();
+    })
+    .then(token => {
+      ctx.cookies.set("Authorization", `Bearer ${token}`);
+      ctx.status = 200;
+    })
+    .catch(e => {
+      ctx.status = 400;
+      ctx.body = e;
+    });
+  ctx.body = newUser;
   ctx.status = 200;
 };
 
@@ -45,7 +50,6 @@ controller.signIn = ctx => {
   });
 
   ctx.cookies.set("Authorization", `Bearer ${token}`);
-
   ctx.status = 200;
 };
 

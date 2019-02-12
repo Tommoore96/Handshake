@@ -32,15 +32,17 @@ class SignUp extends Component {
     };
     fetch("http://localhost:3002/signup", {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: payload
     })
-      .then(response => response.json())
-      .then(response => console.log("Success:", JSON.stringify(response)))
-      .catch(error => console.error("Error:", error));
+      .then(
+        response => console.log("resp: ", response)
+        /*response.json()*/
+      )
+      .then(response => console.log("Success:", JSON.stringify(response)));
+
     e.preventDefault();
   }
 
