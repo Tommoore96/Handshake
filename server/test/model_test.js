@@ -2,27 +2,34 @@ const mocha = require("mocha");
 const assert = require("assert");
 const UserModel = require("../model.js");
 const mongoose = require("mongoose");
-const db = require("../db.js");
+require("../db.js");
+const fetch = require("node-fetch");
 
-describe("Users:", function() {
-  it("should save new users", function(done) {
-    const user = new UserModel({
-      first_name: "Thomas",
-      surname: "Moore",
+function postUser() {
+  fetch("http://localhost:3002/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
       email: "tommoore.dev@gmail.com",
       username: "tommcfc",
-      pass_hash: "27If",
-      city: "Manchester",
-      country: "United Kingdom",
-      age: 22,
-      joined_at: new Date()
-    });
+      password: "MCFCMoore"
+    })
+  })
+    .then(res => res.json())
+    .then(res => res.tokens);
+}
 
-    user.save(done);
+describe("Users:", function() {
+  it("should return tokens", function(done) {
+    console.log(postUser());
+
+    assert.equal(postUser().length, 1);
   });
 
-  it("should find users", function(done) {
-    UserModel.find({ first_name: "Thomas" }, (err, name) => {
+  it("should save users", function(done) {
+    UserModel.find({ email: "tommoore.dev@gmail.com" }, (err, name) => {
       if (err) {
         throw err;
       }
@@ -34,7 +41,7 @@ describe("Users:", function() {
   });
 
   after(function(done) {
-    UserModel.find({ first_name: "Thomas" })
+    UserModel.find({ email: "tommoore.dev@gmail.com" })
       .deleteOne(done)
       .exec();
   });

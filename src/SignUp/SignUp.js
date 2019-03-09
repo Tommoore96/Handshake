@@ -35,14 +35,8 @@ class SignUp extends Component {
       headers: {
         "Content-Type": "application/json"
       },
-      body: payload
-    })
-      .then(
-        response => console.log("resp: ", response)
-        /*response.json()*/
-      )
-      .then(response => console.log("Success:", JSON.stringify(response)));
-
+      body: JSON.stringify(payload)
+    }).then(response => console.log("resp: ", response));
     e.preventDefault();
   }
 

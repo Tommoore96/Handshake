@@ -22,17 +22,17 @@ const User = new Schema({
   ]
 });
 
-User.methods.generateAuthToken = function() {
+User.methods.generateAuthToken = async function() {
   const user = this,
     access = "auth",
-    token = jwt
+    token = await jwt
       .sign({ _id: user._id.toHexString(), access }, "secretKey", {
         expiresIn: "32d"
       })
       .toString();
 
-  user.tokens.push({ access, token });
-  console.log(user.tokens);
+  user.tokens.concat({ access, token });
+  console.log("token: ", user.tokens);
 
   return user.save().then(() => {
     return token;
